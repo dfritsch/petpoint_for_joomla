@@ -1,0 +1,61 @@
+@charset "utf-8";
+/* CSS Document */
+
+.row1, .row0 {
+	//clear:both;
+	border:1px dotted #666;
+	margin:5px;
+	padding:5px;
+	color:#555;
+}
+
+.animal_data {
+	font-size:1.3em;
+	color:#000;
+}
+
+.row1 .animal_picture {
+	float:left;
+}
+
+.row0 .animal_picture {
+	float:right;
+}
+
+.animal_picture img {
+	margin:5px;
+	padding:5px;
+	border:1px solid #666;
+}
+
+.animalID {
+	float:right;
+}
+
+.animal_name, .animal_breed, .animal_sex, .animal_description {
+	margin-bottom:.5em;
+}
+
+.animal_name {
+	font-size:1.3em;
+}
+
+.animal_read_more p {
+	text-align:right;
+}
+
+.animal_name h2 {
+	text-align:center;
+	margin: 0 0 .5em;
+}
+
+.animal_breed {
+}
+.animal_sex {
+}
+.animal_description {
+}
+
+.clr {
+	clear:both;
+}

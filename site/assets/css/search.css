@@ -1,0 +1,13 @@
+@charset "utf-8";
+/* CSS Document */
+
+label {
+	text-align:right;
+	width:150px;
+	display:inline-block;
+	margin:5px;
+}
+
+.clr {
+	clear:both;
+}

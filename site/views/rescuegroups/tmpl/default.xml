@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+	<layout title="Overview Page">
+		<message>
+			<![CDATA[Overview Page Listing Available Animals and Hightlighted Animals.]]>
+		</message>
+	</layout>
+	<state>
+		<name>Rescue Groups Default Layout</name>
+		<description>Overview Page Listing Available Animals and Hightlighted Animals.</description>
+        <url>
+
+        </url>
+		<params>
+
+		</params>
+		<advanced>
+
+		</advanced>
+	</state>
+</metadata>

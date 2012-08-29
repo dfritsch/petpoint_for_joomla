@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<metadata>
+
+	<layout title="Detail">
+
+		<message>
+
+			<![CDATA[Single Animal Layout]]>
+
+		</message>
+
+	</layout>
+
+	<state>
+
+		<name>Deatil</name>
+
+		<description>Single Animal Layout</description>
+
+        <url>
+
+
+
+        </url>
+
+		<params>
+
+
+
+		</params>
+
+		<advanced>
+
+
+
+		</advanced>
+
+	</state>
+
+</metadata>

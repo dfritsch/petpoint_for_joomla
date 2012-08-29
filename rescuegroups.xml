@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install type="component" version="1.5.0" method="upgrade">
+    <name>Rescue Groups</name>
+    <author>Fritsch Services</author>
+    <creationDate>03/06/2011</creationDate>
+    <license>GNU/GPL</license>
+    <version>1.0</version>
+    <description>A Joomla component to display animals from RescueGroups.org's Database. It can be configured to show all animals or specifically for a shelter or organization.</description>
+
+    <!-- installation part -->
+
+    <installfile>admin/sql/install.sql</installfile>
+    <uninstallfile>admin/sql/uninstall.sql</uninstallfile>
+
+    <!-- user part -->
+    <files folder="site">
+        <filename>controller.php</filename>
+        <filename>index.html</filename>
+        <filename>router.php</filename>
+        <filename>rescuegroups.php</filename>
+        <folder>models</folder>
+		<folder>controllers</folder>
+        <folder>views</folder>
+    </files>
+
+    <languages folder="site/language">
+        <language tag="en-GB">en-GB.com_rescuegroups.ini</language>
+    </languages>
+
+    <!-- administration part -->
+    <administration>
+
+    <menu task="default" img="js/ThemeOffice/component.png">Rescue Groups</menu>
+    <submenu>
+        <menu link="option=com_rescuegroups">Rescue Groups</menu>
+    </submenu>
+
+    <files>
+        <filename>rescuegroups.xml</filename>
+    </files>
+    <files folder="admin">
+        <filename>config.xml</filename>
+        <filename>controller.php</filename>
+        <filename>index.html</filename>
+        <filename>rescuegroups.php</filename>
+        <folder>helpers</folder>
+		<folder>install</folder>
+        <folder>models</folder>
+        <folder>tables</folder>
+        <folder>views</folder>
+    </files>
+
+    <languages folder="admin/language">
+        <language tag="en-GB">en-GB.com_rescuegroups.menu.ini</language>
+        <language tag="en-GB">en-GB.com_rescuegroups.ini</language>
+    </languages>
+
+    </administration>
+
+    <params>
+
+    </params>
+
+</install>

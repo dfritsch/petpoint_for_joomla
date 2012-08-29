@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<metadata>
+
+	<layout title="Browse">
+
+		<message>
+
+			<![CDATA[Browse Animals]]>
+
+		</message>
+
+	</layout>
+
+	<state>
+
+		<name>Browse</name>
+
+		<description>Browse Animals.</description>
+
+        <url>
+
+
+
+        </url>
+
+		<params>
+
+		<param name="animal_type" type="radio" default="0" label="Animals to Show" description="Select the animal status to display for this item.">
+				<option value="0">Available and Pending</option>
+				<option value="1">Available</option>
+				<option value="2">Adopted</option>
+				<option value="3">All</option>
+			</param>
+
+		</params>
+
+		<advanced>
+
+
+
+		</advanced>
+
+	</state>
+
+</metadata>
