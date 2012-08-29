@@ -23,13 +23,9 @@ jimport( 'joomla.application.component.view');
 class RescuegroupsViewUpdate extends JView {
     function display($tpl = null) {
 		
-		if (JRequest::getVar('task') =='updateDesc') {
-			$updated =& $this->get('UpdateDesc');
-			echo $updated;
-			exit();
-		} else {
-			$updated =& $this->get('Update');
-		}
+		$updated =& $this->get('Update');
+		
+		echo $updated;
 		
 		$this->assignRef( 'updated', $updated );
 		

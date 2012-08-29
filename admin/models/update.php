@@ -29,140 +29,115 @@ class RescuegroupsModelUpdate extends JModel {
 		
     }
 	
-	function crawl_animals($url) {
-		$updated = 0;
-		$ids = array();
-		
-		$db =& JFactory::getDBO();
-		$dom = new DOMDocument('1.0');
-		@$dom->loadHTMLFile($url);
-		
-		$finder = new DomXPath($dom);
-		$classname="list-item";
-		$nodes = $finder->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
-		
-		foreach ($nodes as $count=>$item) {
-						
-			$newdoc = new DOMDocument();
-			$cloned = $item->cloneNode(TRUE);
-			$newdoc->appendChild($newdoc->importNode($cloned,TRUE));
-			
-			$animal = new DomXPath($newdoc);
-			$info = array();
-			
-			$info['name'] = $this->classQuery($animal, 'list-animal-name');
-			$info['id'] = $this->classQuery($animal, 'list-animal-id');
-			$info['species'] = $this->classQuery($animal, 'list-anima-species');
-			$info['sexSN'] = $this->classQuery($animal, 'list-animal-sexSN');
-			$info['breed'] = $this->classQuery($animal, 'list-animal-breed');
-			$info['age'] = $this->classQuery($animal, 'list-animal-age');
-			
-			$anchors = $newdoc->getElementsByTagName('a');
-			
-			foreach ($anchors as $a) {
-				$info['url'] = str_replace('\')', '', str_replace('javascript:poptastic(\'', 'http://www.petango.com/webservices/adoptablesearch/', $a->getAttribute('href')));
-			}
-			
-			$pics = $newdoc->getElementsByTagName('img');
-			
-			foreach ($pics as $key => $p) {
-				$info['pic'][] = $p->getAttribute('src');
-			}
-			
-			$query = "SELECT id FROM #__rescuegroups WHERE animalID=".$db->quote($info['id']);
-			$db->setQuery($query);
-			$exists= $db->loadAssocList();
-			
-			$query = '';
-			
-			if ($exists) {
-				$query = "UPDATE";
-				$where = ' WHERE id='.$db->quote($exists[0]['id']);
-				$ids[] = $exists[0]['id'];
-				$insertid = false;
-			} else {
-				$query = "INSERT INTO";
-				$where = '';
-				$insertid = true;
-			}
-			
-			$query .= " #__rescuegroups SET name=".$db->quote($info['name']).", animalID=".$db->quote($info['id']).", species=".$db->quote($info['species']).", sex=".$db->quote($info['sexSN']).", breed=".$db->quote($info['breed']).", age=".$db->quote($info['age']).", description=".$db->quote($info['desc']).", petUrl=".$db->quote($info['url']).", status='Available'";
-			
-			foreach ($info['pic'] as $key => $pic) {
-				if ($key>3) {
-					break;
-				}
-				$query .= ', pic'.($key+1).'='.$db->quote($pic);
-			}
-			$query .= $where;
-			//echo $query;
-			$db->setQuery($query);
-			$result = $db->query();
-			if ($insertid) {
-				$ids[] = $db->insertid();
-			}
-			
-			$updated++;
-		}
-		
-		$query = "UPDATE #__rescuegroups SET status='Unknown' WHERE id NOT IN (".implode(',',$ids) . ") AND status='Available'";
-		$db->setQuery($query);
-		$dummy = $db->query();
-		
-		return $updated;
-	}
-	
-	function classQuery($domxpath, $classname, $type='value') {
-		$query = $domxpath->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
-		
-		foreach ($query as $count=>$i) {
-			if ($count==0) {
-				//var_dump($item);
-				if ($type=='html') {
-					$newdoc = new DOMDocument();
-					$cloned = $i->cloneNode(TRUE);
-					$newdoc->appendChild($newdoc->importNode($cloned,TRUE));
-					$string = $newdoc->saveHTML();
-				} else {
-					$string = $i->nodeValue;
-				}
-			}
-		}
-		return $string;
-	}
-	
 	function getUpdate() {
-
-		$url = "http://www.petango.com/webservices/adoptablesearch/wsAdoptableAnimals.aspx?species=Cat&sex=A&agegroup=All&location=shelter&site=&onhold=N&orderby=Random&colnum=1&css=http://sms.petpoint.com/WebServices/adoptablesearch/css/styles.css&authkey=olu7f2to8a3fyhfwvei2ousjhrrh8ghlslmpytmd0wytxohkw4&recAmount=&detailsInPopup=Yes&featuredPet=Include&stageID=";
-		
-		$updated = $this->crawl_animals($url);
-		
-		return $updated;
-		
-	}
-	
-	function getUpdateDesc() {
-		$updated = 0;
 		$db =& JFactory::getDBO();
-		$query = "SELECT * FROM #__rescuegroups WHERE status='Available' AND petUrl != '' LIMIT 25";
-		$db->setQuery($query);
-		$urls = $db->loadAssocList();
+
+		$startPage=1;
+		$limit=10;
+		$updated=0;
 		
-		foreach ($urls as $url) {
-			$dom = new DOMDocument('1.0');
-			@$dom->loadHTMLFile($url['petUrl']);
+		$query = "SELECT max(lastupdated) FROM #__rescuegroups;";
+		$db->setQuery($query);
+		$lastupdated= $db->loadResult();
+		$lastupdated=strtotime($lastupdated)+1;
+		
+		//echo $query;
+		
+		do {
 			
-			$finder = new DomXPath($dom);
-			$info['desc'] = $this->classQuery($finder, 'detail-animal-desc', 'html');
+			$get = "http://api.rescuegroups.org/rest/?key=A0ey0Ed1&status=adopted&type=animals&orgID=98&limit=".$limit."&startPage=".$startPage;
+			if ($lastupdated!=1) {
+				//$get.="&updatedAfter=".$lastupdated;
+			}
 			
-			$query = "UPDATE #__rescuegroups SET description=".$db->quote($info['desc']).", petUrl='' WHERE id=".$db->quote($url['id']);
-			
-			//echo $query;
-			$db->setQuery($query);
+			echo $get;
+		
+		$xml = file_get_contents($get);
+		
+		$query = "DESCRIBE #__rescuegroups;";
+		$db->setQuery($query);
+		$column= $db->loadResultArray();
+		
+		$myFile = "animals.xml";
+		$fh = fopen($myFile, 'w');
+		fwrite($fh, $xml);
+		fclose($fh);
+		
+		$doc = new DOMDocument(); 
+		$doc->load( $myFile ); 
+		
+		$recordcounttag = $doc->getElementsByTagName( "recordCount" ); 
+		$recordcount = $recordcounttag->item(0)->nodeValue;
+		$updated+=$recordcount;
+		   
+		$pets = $doc->getElementsByTagName( "pet" ); 
+		foreach( $pets as $pet ) 
+		{ 
+			$i=1;
+			$query="UPDATE #__rescuegroups SET ";
+			while ($i<count($column)) {
+				//echo $column[$i]."<br>";
+				$tag = $pet->getElementsByTagName( $column[$i] );
+				$value = $tag->item(0)->nodeValue;
+				
+				if ($column[$i]=='lastUpdated') {
+					$value = strftime("%Y-%m-%d %H:%M:%S", $value);
+				} elseif ($column[$i]=='description') {
+					$w = "[\s\S]*?"; //ungreedy wildcard
+					$value = preg_replace("/(\<a $w \/\>\<br \/\>|\<img $w \/\>|\<(span|SPAN) $w\>|\<\/*(span|SPAN|strong|STRONG)\>)/", "", $value);
+					$value = strip_tags($value, '<p>');
+					$value = str_replace("&amp;nbsp;", " ", $value);
+				}
+				
+				$query.= "`" . $column[$i] . "`='" . mysql_real_escape_string($value) . "', ";
+				
+				if ($column[$i]=='animalID') {
+					$where = "`animalID`='".$value."'";
+				}
+				
+				$i++;
+			}
+			$query = substr($query, 0, -2);
+			$querywhere = $query . " WHERE " . $where. ";";
+			$db->setQuery($querywhere);
 			$result = $db->query();
-			$updated++;
+			
+			$rows = $db->getAffectedRows();
+			//echo "Rows: " . $rows . "<br>";
+			//$error = $db->getErrorMsg();
+			//echo "Error: " . $error . "<br>";
+			
+			if ($rows==0) {
+				$query = str_replace("UPDATE", "INSERT INTO", $query);
+				$db->setQuery($query);
+				$result = $db->query();
+			}
+			
+			$rows = $db->getAffectedRows();
+			//echo "Rows: " . $rows . "<br>";
+			//$error = $db->getErrorMsg();
+			//echo "Error: " . $error . "<br>";
+		} 
+		
+		//echo "Page: ".$startPage."<br>";
+		//echo "Animals Updated: " . $updated . "<br>";
+		
+		$startPage++;
+		
+		} while($recordcount!=0);
+		
+		$query = "SELECT id FROM #__rescuegroups WHERE status!='Available' AND status!='Adopted'";
+		$db->setQuery($query);
+		$deleted= $db->loadResultArray();
+		
+		foreach($deleted as $delete) {
+			$query = "DELETE FROM #__rescuegroups WHERE id='$delete'";
+			$db->setQuery($query);
+			$dummy = $db->query();
 		}
+		
 		return $updated;
+		
 	}
 }
 ?>
